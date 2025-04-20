@@ -1,1 +1,4 @@
+# API credentials and tokens
+*credentials*.json
+*_token*.json
 .env
