@@ -30,11 +30,32 @@
    - Using `google-auth-oauthlib` library - [Source](https://stackoverflow.com/questions/65695786/gmail-api-how-to-simply-authenticate-a-user-and-get-a-list-of-their-messages)
    - Store credentials in a token file (e.g., token.json) - [Source](https://developers.google.com/gmail/api/quickstart/python)
    - Token refresh handled by library - [Source](https://developers.google.com/gmail/api/quickstart/python)
+   - When tokens expire but have a refresh token, they can be refreshed automatically
+   - If no valid credentials exist, the user needs to go through the authorization flow
 
 3. **Accessing Labeled Emails**:
    - Can filter emails by label using `labelIds` parameter - [Source](https://developers.google.com/gmail/api/guides/filtering)
    - Example: `service.users().messages().list(userId='me', labelIds=['INBOX']).execute()` - [Source](https://stackoverflow.com/questions/60750345/gmail-api-unable-to-list-all-mails-by-labels)
    - For "Newsletters" label, need to first get the ID using `labels().list()` - [Source](https://developers.google.com/gmail/api/reference/rest/v1/users.labels/get)
+   - Label IDs need to be retrieved by name by iterating through all labels and matching against the desired name
+   - Messages are fetched using the label ID directly rather than using a query parameter
+
+4. **Email Content Extraction**:
+   - Messages are retrieved in 'full' format to access complete content
+   - Message content is stored in the payload of the message
+   - Headers contain metadata such as From, To, Subject, and Date
+   - Email content can exist in various MIME types (text/plain, text/html)
+   - Content is base64url encoded and needs to be decoded
+   - Multipart emails require parsing through nested parts
+   - BeautifulSoup is effective for HTML content parsing
+   - Scripts and style elements should be removed when extracting text from HTML
+   - Links can be extracted from HTML using BeautifulSoup's find_all method
+
+5. **Data Storage and Analysis**:
+   - Structured data can be stored in JSON format for flexibility
+   - Summary data can be stored in CSV format using pandas
+   - File organization by email and content type helps maintain structure
+   - Timestamps help track when analysis was performed
 
 ### Important Considerations
 - **Token Storage**: 
@@ -45,12 +66,10 @@
   - Implement exponential backoff for retries - [Unverified - Need to research]
   - Monitor quota usage in Google Cloud Console - [Unverified - Need to research]
 
-### Questions for Further Research
-- Exact format of email metadata returned by the API
-- Testing with sample newsletter emails to understand structure
-- Handling of HTML vs. plain text content in newsletters
-- Best practices for implementing exponential backoff
-- How to extract links and format content for newsletter generation
+- **Error Handling**:
+  - Implement try/except blocks around API calls
+  - Handle specific error cases for message processing
+  - Create robust error logging to trace issues
 
 ### Resources
 - [Gmail API Python Quickstart](https://developers.google.com/gmail/api/quickstart/python)
